@@ -1,13 +1,15 @@
 {% extends "top/base.html" %}
 
-{% block title %}サイト名トップ{% endblock %}
+{% block title %}アプリ名トップ{% endblock %}
 
-{% block nav %}<a href="{{url_for('signup')}}">新規登録</a>
-<a href="{{url_for('login_view')}}">ログイン</a>{% endblock %}
+{% block nav %}
+<a class="link" href="{{url_for('signup')}}">新規登録</a>
+<a class="link" href="{{url_for('login_view')}}">ログイン</a>
+{% endblock %}
 
 {% block main %}
 <img
  src="{{ url_for('static',filename='img/cafe_color.png') }}"
- class="auth-main-pic"
+ class="main-pic"
 />
 {% endblock %}

@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サインアップ</title>
-</head>
-<body>
+{% extends "top/base.html" %}
+
+{% block title %}サインアップ{% endblock %}
+
+{% block nav %}<a class="link" href="{{url_for('top')}}">キャンセル</a>
+{% endblock %}
+
+{% block main %}
     <h1>新規登録</h1>
     <form action ='' method="post">
         <div>
@@ -26,5 +26,6 @@
         </div>
         <input type = 'submit' value="登録">
     </form>
+{% endblock %}
 </body>
 </html>
