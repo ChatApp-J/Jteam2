@@ -1,4 +1,4 @@
-/* トップ・ログイン・サインアップのCSS */
+/* ヘッダー・ナビゲーションのCSS */
 header{
     color:white;
     background-color: #009bc6; 
@@ -7,7 +7,7 @@ header{
     margin: 0em 1em;
     padding: 0.5em;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
 }
 .logo{
@@ -23,9 +23,12 @@ header{
 .link{
     color: white;
     text-decoration: underline;
+    font-size: 0.7em;
 }
 .main-pic{
-    margin: 10px;
-    display: flex;
-    justify-content: center;
+    margin: 10px 0Px;
+}
+img{
+    max-width: 100%; /* 親要素の幅を超えない最大幅 */
+    height: auto;    /* 元の縦横比を維持 */
 }
