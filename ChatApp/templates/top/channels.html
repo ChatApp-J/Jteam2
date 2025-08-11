@@ -1,14 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>
-        初めまして
-        
-    </h1>
-</body>
-</html>
+{% extends 'top/base.html' %}
+
+{% block title %}
+<title>home</title>
+{% endblock %} 
+
+{% block nav %}
+<a class="link" href="{{url_for('logout')}}">ログアウト</a>
+{% endblock %}
+
+{% block main %}
+<div class="main-container">
+  <div class="channel-title">
+    <h1>CHANNEL一覧</h1>
+    <p class="channel-user">ようこそ、{{ nickname }} さん</p>
+  </div>
+
+  <div id="channels-list">
+    <ul class="channel-box"></ul>
+  </div>
+  
+  <div id="footer">
+    <p id="footer-text">アプリの名前？</p>
+  </div>
+  {% include 'top/modal/create_channel.html' %}
+  {% include 'top/modal/update_channel.html' %}
+  {% include 'top/modal/delete_channel.html' %}
+</div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript">
+  // prettier-ignore
+  const channels = JSON.parse('{{ channels|tojson }}');
+  // prettier-ignore
+  const uid = JSON.parse('{{ uid|tojson }}');
+</script>
+<script
+  src="{{url_for('static',filename='js/channels/create_channel.js')}}"
+  type="module"
+></script>
+<script
+  src="{{url_for('static',filename='js/channels/channel_list.js')}}"
+  type="module"
+></script>
+<script
+  src="{{url_for('static',filename='js/channels/update_channel.js')}}"
+  type="module"
+></script>
+<script
+  src="{{url_for('static',filename='js/channels/delete_channel.js')}}"
+  type="module"
+></script>
+{% endblock %}
