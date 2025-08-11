@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 import re
 import uuid
 import hashlib
-from models import User
+from models import User, Channel
 import os
 from datetime import timedelta
 
@@ -61,9 +61,7 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
             return redirect(url_for('channels_view'))
     return redirect(url_for('signup'))
         
-    
-    
-    
+        
     
     #ログインページの表示
 #画面の取得なのでGETメソッド
@@ -75,26 +73,181 @@ def login_view():
 
 
 #ログインの処理
+@app.route('/login', methods=['POST'])
+def login_process():
+    #ログイン画面のフォームに入力されたemailを取得
+    email = request.form.get('email')
+    #ログイン画面のフォームに入力されたpasswordを取得
+    password = request.form.get('password')
+    #もしemailあるいはpasswordがなければ
+    if not email or not password:
+        #空欄がありますと表示
+        flash('空欄があります')
+    #空欄がなければ
+    else:
+        #入力されたemailが新規登録で登録されたemailと一致しているか確認
+        user = User.find_by_email(email)
+        #もし一致せずuserがなければ、このユーザーは存在しませんと表示
+        if user is None:
+            flash('このユーザーは存在しません。')
+        else:
+            salt = "Solty"
+            salt_password = password+salt
+            password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
+            #入力されたパッシュ化されたpasswordとデータベースに登録されているそのユーザーのハッシュ化済みパスワードが一致しなければ 
+            if password != user["password"]:
+                #パスワードが間違っています！と表示
+                flash('パスワードが間違っています！')
+            else:
+                #パスワードが一致すれば、このuserのidをセッションに一時保存する
+                session['uid'] = user["uid"]
+                #チャンネル一覧ページに遷移
+                return redirect(url_for('channels_view'))
+    return redirect(url_for('login_view'))
 
 
 #ログアウトの処理
+@app.route('/logout')
+def logout():
+    #セッションに保存されている全ての情報を削除
+    session.clear()
+    #「ログアウトしました」と表示され、ログインページに遷移
+    flash('ログアウトしました')
+    return redirect(url_for('login_view'))
 
 
-#チャンネル一覧ページ（ホーム？）の表示
+#チャンネル一覧ページの表示
+@app.route('/channels', methods=['GET'])
+def channels_view():
+    #セッションからidを取得
+    uid = session.get('uid')
+    #もしidがなければログインされていないということなので、ログインページに遷移
+    if uid is None:
+        return redirect(url_for('login_view'))
+    else:
+        #idがあれば、チャンネルテーブル情報を全て取得
+        channels = Channel.get_all()
+        #ユーザーテーブルから　nicknameを取得する
+        user = User.find_by_uid(uid)
+        nickname = user['nickname'] 
+        #チャンネル一覧ページに遷移する
+        return render_template('top/channels.html', channels=channels, nickname=nickname, uid=uid)
 
 
+# チャンネルの作成
+@app.route('/channels', methods=['POST'])
+def create_channel():
+    #セッションからidを取得
+    uid = session.get('uid')
+    #もしidがなければ、ログインしていないということなので、ログインページに遷移
+    if uid is None:
+        return redirect(url_for('login_view'))
+    #フォームに入力されたchannnel_titleを取得して、name変数に代入
+    name = request.form.get('channel_title')
+    #フォームに入力されたchannel_descriptionを取得して、description変数に代入
+    description = request.form.get('channel_description')
+    #もしnameあるいはdescriptionのどちらか一方でも空欄だったら
+    if not name or not description:
+        #「空欄があります」とメッセージが表示
+        flash('空欄があります')
+    #空欄がなければ    
+    else:
+        #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
+        exist_channel = Channel.find_by_name(name)
+        #もし同じ名前のchannelがあったら
+        if exist_channel:
+            #「このチャンネルタイトルは既にあります」のメッセージが表示
+            flash('このチャンネルタイトルは既にあります')
+        #同じ名前のchannelがなければ
+        else:
+            #nameとdescriptionが入った新しいchannelが作られる
+            Channel.create(uid, name, description)
+            #「新しいchannelを作成しました」のメッセージが表示
+            flash('新しいchannelを作成しました')
+            #作成したチャンネルが含まれた、更新されたチャンネル一覧ページに遷移
+            return redirect(url_for('channels_view'))
+    #途中条件に合致しなければ、更新前のチャンネル一覧ページに遷移
+    return redirect(url_for('channels_view'))    
 
-# チャンネル（ルーム？）の作成
 
+# チャンネルの編集、更新
+@app.route('/channels/update_channel/<int:cid>', methods=['POST'])
+def update_channel(cid):
+    uid = session.get('uid')
+    if uid is None:
+        return redirect(url_for('login_view'))
+    #編集、更新するchannelのid(cid)を探して、channel変数に代入
+    channel = Channel.find_by_cid(cid)  
+    #もし編集するchannelを作成したuidとログインしているユーザーのidが違ったら
+    if channel['uid'] != uid:
+        #「このチャンネルの編集権限がありません」と表示
+        flash('このチャンネルの編集権限がありません')
+    #編集するchannelを作成したuidとログインしているユーザーのuidが同じだったら
+    else:
+        #編集フォームに入力されたchannel_titleを取得しname変数に代入
+        name = request.form.get('channel_title')
+        #編集フォームに入力されたchannel_descriptionを取得しdescription変数に代入
+        description = request.form.get('channel_description')
+        #もしnameとdescriptionが空欄だったら
+        if not name or not description:
+            #「空欄があります」のメッセージが表示
+            flash('空欄があります')
+        #空欄でなければ
+        else:
+            #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
+            exist_channel = Channel.find_by_name(name)
+            #もし同じ名前のchannelがあったら
+            if exist_channel:
+                #「このチャンネルタイトルは既にあります」のメッセージが表示
+                flash('このチャンネルタイトルは既にあります')
+            #同じ名前のchannelがなければ
+            else:
+                #channelに編集されたnameとdescriptionが入る
+                Channel.update(name, description, cid)
+                #「チャンネルを編集しました」のメッセージが表示
+                flash('チャンネルを編集しました')
+                #編集済みのchannelも含まれる更新されたチャンネル一覧ページに遷移
+                return redirect(url_for('channels_view'))
+    #途中条件に合致しなければ、更新前のチャンネル一覧ページに遷移
+    return redirect(url_for('channels_view'))        
+        
 
-# チャンネル（ルーム？）の更新
-
-
-# チャンネル（ルーム？）の削除
+# チャンネルの削除
+@app.route('/channels/delete_channel/<int:cid>', methods=['POST'])
+def delete_channel(cid):
+    uid = session.get('uid')
+    if uid is None:
+        return redirect(url_for('login_view'))
+    #削除するchannelのid(cid)を探して、channel変数に代入
+    channel = Channel.find_by_cid(cid)
+    #もし削除するchannelを作成したidとログインしているユーザーのidが違ったら
+    if channel['uid'] != uid:
+        #「このチャンネルの削除権限がありません」と表示
+        flash('このチャンネルの削除権限がありません')
+    #削除するchannelを作成したidとログインしているユーザーのidが同じだったら
+    else:
+        #該当のチャンネルを削除
+        Channel.delete(cid)
+        #「チャンネルを削除しました」のメッセージが表示
+        flash('チャンネルを削除しました')
+        #削除後のチャンネル一覧ページに遷移
+        return redirect(url_for('channels_view'))
+    #途中の条件に合致しなければ、削除せずチャンネル一覧ページに遷移
+    return redirect(url_for('channels_view'))
 
 
 # チャンネル詳細ページ（ルーム）の表示（各チャンネル内で、そのチャンネルに属している全メッセージを表示させる）
-
+@app.route('/channels/<int:cid>/messages', methods=['GET'])
+def detail(cid):
+    uid = session.get('uid')
+    if uid is None:
+        return redirect(url_for('login_view'))
+    #該当のchannelのid(cid)を探して、channel変数に代入
+    channel = Channel.find_by_cid(cid)
+    #該当のチャンネルのcidをもとにメッセージを全て取得して、messages変数に代入
+    messages = Message.get_all(cid)
+    #該当のチャンネルのメッセージ画面に遷移  
+    return render_template('messages.html', messages=messages, channel=channel, uid=uid)
 
 # メッセージの投稿
 
