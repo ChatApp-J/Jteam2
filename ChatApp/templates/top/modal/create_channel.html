@@ -1,0 +1,32 @@
+<div id="create_channel-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Channel新規作成</h5>
+      <span class="modalClose" id="add-page-close-button">×</span>
+    </div>
+    <form
+      id="createChannelForm"
+      class="modal-body"
+      action="/channels"
+      method="POST"
+    >
+      <input
+        type="text"
+        placeholder="Channelの名前"
+        class="channel-form-input"
+        name="channel_title"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Channelの説明"
+        class="channel-form-input"
+        name="channel_description"
+        required
+      />
+      <div class="modal-footer">
+        <button>作成</button>
+      </div>
+    </form>
+  </div>
+</div>
