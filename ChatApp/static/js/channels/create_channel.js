@@ -6,6 +6,8 @@ export const initCreateChannelModal = () => {
   const createChannelButton = document.getElementById("create_channel-button");
 
   // モーダル表示ボタンが押された時にモーダルを表示する
+  //対象の要素.addEventListener(イベントの種類, 関数,false);でイベント処理を実行するメソッド
+  //clickされたら{}内の処理を実行する
   createChannelButton.addEventListener("click", () => {
     createChannelModal.style.display = "flex";
   });

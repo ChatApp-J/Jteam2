@@ -46,7 +46,7 @@ const createChannelsList = () => {
     ul.appendChild(li);
         
     // もしチャンネル作成者uidと自分のuidが同じだった場合は編集ボタンを追加
-    if (uid === channel.uid){
+    if (uid === channel.created_by){
       //createElement(タグ名)、引数のタグ名で指定されたHTML要素を生成  
       const updateChannelButton = document.createElement('button')
       //innerHTMLはHTML要素の<開始タグ>と<終了タグ>に内包されたものでテキストだけでなくHTML要素も認識できる
@@ -70,7 +70,7 @@ const createChannelsList = () => {
     };        
             
     // もしチャンネル作成者uidと自分のuidが同じだった場合は削除ボタンを追加
-    if (uid === channel.uid) {
+    if (uid === channel.created_by) {
       const deleteChannelButton = document.createElement('button');
       deleteChannelButton.innerHTML =
         '<ion-icon name="trash-bin-outline" style="color: blue"></ion-icon>';
