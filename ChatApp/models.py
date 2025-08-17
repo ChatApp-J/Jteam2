@@ -1,21 +1,21 @@
 from flask import abort
 import pymysql
 from util.DB import DB
-
+import random, string
 
 db_pool = DB.init_db_pool()
 
 #ユーザークラス
 class User:
     @classmethod
-    def create(cls, uid, name, email, nickname, password):
+    def create(cls, uid,name, email, nickname, password,salt):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:#SQLを操作するためにカーソルを取得
                 #データを入れ込む所をカーソルに教える%sは目印
-                sql = "INSERT INTO users (uid, name, email, nickname, password) VALUES (%s, %s, %s, %s, %s);" 
+                sql = "INSERT INTO users (uid, name, email, nickname, password, salt) VALUES (%s, %s, %s, %s, %s, %s);" 
                 #実行して埋め込み
-                cur.execute(sql, (uid, name, email, nickname,password))
+                cur.execute(sql, ( uid,name, email, nickname,password, salt))
                 #変更を反映する
                 conn.commit()
         except pymysql.Error as e:# この関数をeと呼ぶ
@@ -39,6 +39,43 @@ class User:
            abort(500)
         finally:
            db_pool.release(conn)
+           
+    @classmethod
+    def random_name(cls, n):
+        randlst =[random.choice(string.ascii_letters +string.digits) for i in range(10)]
+        return  ''.join(randlst)
+    
+    
+#メッセージクラス
+class Message:
+    @classmethod
+    def create(cls, uid, cid, message):
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = "INSERT INTO messages(uid, cid, message) VALUES(%s,%s,%s);"
+                cur.execute(sql, (uid,cid, message,))#タプル型で渡さないといけないため最後もカンマが必要
+                conn.commit()
+        except pymysql.Error as e:
+            print(f"エラーが発生しています:{e}")
+            abort(500)
+        finally:
+            db_pool.release(conn)
+
+    
+    @classmethod
+    def delete(cls, message_id):
+        conn = db_pool.get_conn()    
+        try:
+            with conn.cursor() as cur:
+                sql = "DELETE FROM messages WHERE id=%s;"
+                cur.execute(sql, (message_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f"エラーが発生しています:{e}")
+            abort(500)
+        finally:
+           db_pool.release(conn)
 
 
     @classmethod
@@ -56,8 +93,25 @@ class User:
             abort(500)
         finally:
             db_pool.release(conn)
-
-
+            
+            
+    @classmethod
+    def get_all(cls, cid):
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = 'SELECT id, u.uid, nickname, message FROM messages AS m INNER JOIN users AS u ON m.uid = u.uid WHERE cid = %s ORDER BY id ASC;'
+                #messagesのuidとusersのuidを結合しメッセージを取得したいチャンネルIDの行だけ残し欲しい列のid, u.uid, nickname, messageを取り出しIDが小さい順で並び替え
+                cur.execute(sql,(cid))#ユーザーが選択したチャンネルIDをsqlに渡す
+                message = cur.fetchall()#cur.executeで受けっとた全てをmessageに代入
+                return message
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
+        finally:
+            db_pool.release(conn)
+            
+                
 #チャンネルクラス
 class Channel:
     @classmethod
@@ -71,7 +125,7 @@ class Channel:
             with conn.cursor() as cur:
                 #channelsテーブルにuid,name,descriptionを追加する
                 #VALUE (%s, %s, %s)はプレースホルダ。安全に値を埋め込むためのもの
-                sql = 'INSERT INTO channels(uid, name, description) VALUES (%s, %s, %s);'
+                sql = 'INSERT INTO channels(uid, name, description) VALUES (%s, %s, %s)'
                 #sqlを実行
                 cur.execute(sql, (uid, name, description,))
                 #データベースに変更を反映（保存）し、トランザクションを確定させる  

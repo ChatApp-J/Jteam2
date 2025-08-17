@@ -52,6 +52,15 @@
             ログイン
           </a>
       </form>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <script>
+      {% for msg in messages %}
+        alert("{{ msg }}");
+      {% endfor %}
+    </script>
+    {% endif %}
+  {% endwith %}
 </div>
 {% endblock %}
 </body>
