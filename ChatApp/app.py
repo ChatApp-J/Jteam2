@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 import re
 import uuid
 import hashlib
-from models import User, Channel
+from models import User, Message, Channel
 import os
 from datetime import timedelta
 
@@ -46,8 +46,9 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
         
     else:
         uid = uuid.uuid4()
-        #任意の文字列を加えることでより複雑なハッシュ化をする　salt
-        salt = "Solty"
+        #ランダムの文字列を加えることでより複雑なハッシュ化をする　salt
+        salt = User.random_name(10)
+        print(salt)
         salt_password = password+salt
         password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
         registered_user = User.find_by_email(email)#データベースに同じアドレスを探す
@@ -55,7 +56,7 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
         if registered_user != None:#もし同じアドレスがあったら
                 flash('既に登録されているようです')
         else:
-            User.create(uid, name, email, nickname,password)
+            User.create(uid, name, email, nickname,password,salt)
             UserId = str(uid)
             session['uid'] = UserId
             return redirect(url_for('channels_view'))
@@ -91,13 +92,15 @@ def login_process():
         if user is None:
             flash('このユーザーは存在しません。')
         else:
-            salt = "Solty"
+            user = User.find_by_email(email)
+            salt = user['salt'] 
             salt_password = password+salt
             password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
             #入力されたパッシュ化されたpasswordとデータベースに登録されているそのユーザーのハッシュ化済みパスワードが一致しなければ 
             if password != user["password"]:
                 #パスワードが間違っています！と表示
                 flash('パスワードが間違っています！')
+                return redirect(url_for('login_view')) 
             else:
                 #パスワードが一致すれば、このuserのidをセッションに一時保存する
                 session['uid'] = user["uid"]
@@ -128,7 +131,7 @@ def channels_view():
         #idがあれば、チャンネルテーブル情報を全て取得
         channels = Channel.get_all()
         #ユーザーテーブルから　nicknameを取得する
-        user = User.find_by_uid(uid)
+        user = Message.find_by_uid(uid)
         nickname = user['nickname'] 
         #チャンネル一覧ページに遷移する
         return render_template('top/channels.html', channels=channels, nickname=nickname, uid=uid)
@@ -237,7 +240,7 @@ def delete_channel(cid):
 
 
 # チャンネル詳細ページ（ルーム）の表示（各チャンネル内で、そのチャンネルに属している全メッセージを表示させる）
-@app.route('/channels/<int:cid>/messages', methods=['GET'])
+@app.route('/channels/<cid>/messages', methods=['GET'])
 def detail(cid):
     uid = session.get('uid')
     if uid is None:
@@ -247,12 +250,33 @@ def detail(cid):
     #該当のチャンネルのcidをもとにメッセージを全て取得して、messages変数に代入
     messages = Message.get_all(cid)
     #該当のチャンネルのメッセージ画面に遷移  
-    return render_template('messages.html', messages=messages, channel=channel, uid=uid)
+    return render_template('top/messages.html', messages=messages, channel=channel, uid=uid)
 
 # メッセージの投稿
-
-
+@app.route("/channels/<cid>/messages", methods=["POST"] )
+def create_message(cid):#ユーザーがどのチャンネルに入ったかを受け取りそのチャンネルIDをcidに入れる
+    uid=session.get('uid')#セッションの確認
+    if uid is None: #Noneの場合は比べることが出来ないため　＝　ではなく　is　を使用する
+        return redirect (url_for("login_view"))
+    
+    message = request.form.get("message") #フォームからメッセージを受け取る
+    if message:
+        Message.create(uid,cid,message)#DBに保存
+    
+    return redirect(url_for("detail", cid=cid))#今後app.routeが変更になっても関数が同じなら使えるためURL＿forを使用
+    
+        
 # メッセージの削除
+@app.route("/<cid>/messages", methods=["POST"])
+def delete_message(cid,message_id):
+    uid = session["uid"]
+    if uid is None:
+        return redirect (url_for("login_view"))
+
+    if message_id:
+        Message.delete(message_id)
+    return redirect (url_for("detail", cid=cid))
+        
 
 
 if __name__ == '__main__':

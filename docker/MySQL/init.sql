@@ -1,27 +1,28 @@
 DROP DATABASE IF EXISTS j_team;
-DROP USER IF EXISTS 'j_team';
+DROP USER IF EXISTS 'j_team'@'%';
 
 
-CREATE USER 'j_team' IDENTIFIED BY 'j_team';  -- データベースを操作するuserを作成
+CREATE USER 'j_team'@'%' IDENTIFIED BY 'j_team';  -- データベースを操作するuserを作成
 CREATE DATABASE j_team; -- データベースを作成　名前はChatApp
 
-USE j_team; -- ここからはChatAppのデータベースを操作する
+USE j_team; -- ここからはj_teamのデータベースを操作する
 
-GRANT ALL PRIVILEGES ON j_team.* TO j_team;  -- ChatAppでの全権限を付与
+GRANT ALL PRIVILEGES ON j_team.* TO 'j_team'@'%';  -- データベスj_teamでの全権限を付与
 
 CREATE TABLE users(
-    uid VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(255)  NOT NULL,
+    uid CHAR(36) PRIMARY KEY,
+    name VARCHAR(50)  NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    nickname VARCHAR(255) UNIQUE NOT NULL,
+    nickname VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    salt CHAR(64) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE channels (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    uid VARCHAR(255) NOT NULL,
+    uid CHAR(36) NOT NULL,
     name VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -29,3 +30,13 @@ CREATE TABLE channels (
     FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
 );
 
+CREATE TABLE messages(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uid CHAR(36) NOT NULL,
+    cid INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (cid) REFERENCES channels(id) ON DELETE CASCADE
+);
