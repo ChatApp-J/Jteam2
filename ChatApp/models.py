@@ -115,8 +115,8 @@ class Message:
 #チャンネルクラス
 class Channel:
     @classmethod
-    #チャンネル新規作成に使うcreate関数を定義。引数としてuid,name,descriptionを渡す
-    def create(cls, uid, name, description):
+    #チャンネル新規作成に使うcreate関数を定義。引数としてname,description,created_byを渡す
+    def create(cls, name, description, created_by):
         #（一度返却した）データベース接続プールからコネクションを取得してconnに代入
         conn = db_pool.get_conn()
         #tryの中でSQLクエリの実行などを行う
@@ -125,9 +125,9 @@ class Channel:
             with conn.cursor() as cur:
                 #channelsテーブルにuid,name,descriptionを追加する
                 #VALUE (%s, %s, %s)はプレースホルダ。安全に値を埋め込むためのもの
-                sql = 'INSERT INTO channels(uid, name, description) VALUES (%s, %s, %s)'
+                sql = 'INSERT INTO channels(name, description, created_by) VALUES (%s, %s, %s);'
                 #sqlを実行
-                cur.execute(sql, (uid, name, description,))
+                cur.execute(sql, (name, description, created_by))
                 #データベースに変更を反映（保存）し、トランザクションを確定させる  
                 conn.commit()
                 #INSERT.UPDATE.DELETEの場合に使う

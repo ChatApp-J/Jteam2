@@ -149,10 +149,10 @@ def create_channel():
     name = request.form.get('channel_title')
     #フォームに入力されたchannel_descriptionを取得して、description変数に代入
     description = request.form.get('channel_description')
-    #もしnameあるいはdescriptionのどちらか一方でも空欄だったら
-    if not name or not description:
-        #「空欄があります」とメッセージが表示
-        flash('空欄があります')
+    #もしnameが空欄だったら
+    if not name:
+        #メッセージが表示
+        flash('チャンネルタイトルが空欄です')
     #空欄がなければ    
     else:
         #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
@@ -164,7 +164,7 @@ def create_channel():
         #同じ名前のchannelがなければ
         else:
             #nameとdescriptionが入った新しいchannelが作られる
-            Channel.create(uid, name, description)
+            Channel.create(name, description, created_by=uid)
             #「新しいchannelを作成しました」のメッセージが表示
             flash('新しいchannelを作成しました')
             #作成したチャンネルが含まれた、更新されたチャンネル一覧ページに遷移
@@ -182,7 +182,7 @@ def update_channel(cid):
     #編集、更新するchannelのid(cid)を探して、channel変数に代入
     channel = Channel.find_by_cid(cid)  
     #もし編集するchannelを作成したuidとログインしているユーザーのidが違ったら
-    if channel['uid'] != uid:
+    if channel['created_by'] != uid:
         #「このチャンネルの編集権限がありません」と表示
         flash('このチャンネルの編集権限がありません')
     #編集するchannelを作成したuidとログインしているユーザーのuidが同じだったら
@@ -191,10 +191,10 @@ def update_channel(cid):
         name = request.form.get('channel_title')
         #編集フォームに入力されたchannel_descriptionを取得しdescription変数に代入
         description = request.form.get('channel_description')
-        #もしnameとdescriptionが空欄だったら
-        if not name or not description:
-            #「空欄があります」のメッセージが表示
-            flash('空欄があります')
+        #もしnameが空欄だったら
+        if not name:
+            #メッセージが表示
+            flash('チャンネルタイトルが空欄です')
         #空欄でなければ
         else:
             #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
@@ -224,7 +224,7 @@ def delete_channel(cid):
     #削除するchannelのid(cid)を探して、channel変数に代入
     channel = Channel.find_by_cid(cid)
     #もし削除するchannelを作成したidとログインしているユーザーのidが違ったら
-    if channel['uid'] != uid:
+    if channel['created_by'] != uid:
         #「このチャンネルの削除権限がありません」と表示
         flash('このチャンネルの削除権限がありません')
     #削除するchannelを作成したidとログインしているユーザーのidが同じだったら
