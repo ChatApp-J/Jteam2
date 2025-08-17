@@ -32,3 +32,36 @@ img{
     max-width: 100%; /* 親要素の幅を超えない最大幅 */
     height: auto;    /* 元の縦横比を維持 */
 }
+
+/* ログイン・サインアップページのCSS */
+.auth-wrapper{
+    color: #009BC6;
+}
+h1{
+    color:#403C3C;
+    text-align: center;
+}
+
+label{
+    display: flex;
+    flex-direction: column;
+    font-size: 0.7em;
+}
+input{
+    text-align: center;
+    width: 75%;
+}
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.auth-button{
+    margin: 40px 0px;
+    width: 120px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: #009BC6;
+    color: white;
+    border: none;
+}
