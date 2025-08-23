@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/top.css')}}">
     <title>{% block title %}タイトル{% endblock %}</title>
 </head>
-<body>
-    <header>
-        <h1>アプリ名</h1>
-        <nav>{% block nav %}ナビゲーション{% endblock %}</nav>
+{% block bgcolor %}<body bgcolor="#C8E4EC">{% endblock %}
+    {% block header %}<header>{% endblock %}
+        <div class="header-inner">
+            <p class="logo">アプリ名</p>
+            <nav class="top-nav">
+                {% block nav %}ナビゲーションメニュー{% endblock %}
+            </nav>
+        </div>
     </header>
     <main>{% block main %}内容{% endblock %}</main>
+    <!-- アイコンの素材 -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    {% block script %}{% endblock %}
 </body>
 </html>

@@ -1,31 +1,38 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン</title>
-</head>
-<body>
-    {% with messages = get_flashed_messages() %}
- 　　 {% if messages %}
-   　　 <ul class="flashes">
-    　　  {% for message in messages %}
-   　　     <li>{{ message }}</li>
-  　　    {% endfor %}
-   　　 </ul>
- 　　 {% endif %}
-　　{% endwith %}
+{% extends "top/base.html" %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block nav %}
+<a class="link" href="{{url_for('top')}}">TOP</a>
+{% endblock %}
+
+{% block main %}
+<div class="auth-wrapper">    
     <h1>ログイン</h1>
     <form method="POST">
         <div>
             <label for="email">EMAIL ADDRESS</label>
-            <input type="text" name="email" required>
+            <input type="text" name="email">
         </div>
         <div>
             <label for="password">PASSWORD</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password">
         </div>
-        <input type="submit" value="ログイン">
+      <div class="auth-button-container"></div>    
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+          <input class="auth-button" type="submit" value="ログイン">
+          <a class="switch-auth-mode" href="{{ url_for('signup') }}">
+            新規登録
+          </a>
+      </div>
     </form> 
-</body>
-</html>
+</div>    
+{% endblock %}
