@@ -195,13 +195,13 @@ class Channel:
             db_pool.release(conn)
 
     @classmethod
-    def update(cls, name, description, cid):
+    def update(cls, name, description, id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                 #channelsテーブルの該当のidにおける、uid,name,descriptionを更新する
                 sql = 'UPDATE channels SET name=%s, description=%s WHERE id=%s;'
-                cur.execute(sql,(name, description, cid,))
+                cur.execute(sql,(name, description, id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -210,13 +210,13 @@ class Channel:
             db_pool.release(conn)
 
     @classmethod
-    def delete(cls,cid):
+    def delete(cls,id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                 #channelsテーブルの該当のidを削除する
                 sql = 'DELETE FROM channels WHERE id=%s;'
-                cur.execute(sql,(cid,))
+                cur.execute(sql,(id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')

@@ -152,7 +152,7 @@ def create_channel():
     #もしnameが空欄だったら
     if not name:
         #メッセージが表示
-        flash('チャンネルタイトルが空欄です')
+        flash('Channelの名前が空欄です')
     #空欄がなければ    
     else:
         #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
@@ -160,7 +160,7 @@ def create_channel():
         #もし同じ名前のchannelがあったら
         if exist_channel:
             #「このチャンネルタイトルは既にあります」のメッセージが表示
-            flash('このチャンネルタイトルは既にあります')
+            flash('このchannelの名前は既にあります')
         #同じ名前のchannelがなければ
         else:
             #nameとdescriptionが入った新しいchannelが作られる
@@ -184,31 +184,31 @@ def update_channel(cid):
     #もし編集するchannelを作成したuidとログインしているユーザーのidが違ったら
     if channel['created_by'] != uid:
         #「このチャンネルの編集権限がありません」と表示
-        flash('このチャンネルの編集権限がありません')
+        flash('このChannelの編集権限がありません')
     #編集するchannelを作成したuidとログインしているユーザーのuidが同じだったら
     else:
         #編集フォームに入力されたchannel_titleを取得しname変数に代入
         name = request.form.get('channel_title')
         #編集フォームに入力されたchannel_descriptionを取得しdescription変数に代入
         description = request.form.get('channel_description')
-        #もしnameが空欄だったら
+        #もしnameが空欄か
         if not name:
             #メッセージが表示
-            flash('チャンネルタイトルが空欄です')
+            flash('Channelの名前が空欄です')
         #空欄でなければ
         else:
             #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
             exist_channel = Channel.find_by_name(name)
-            #もし同じ名前のchannelがあったら
-            if exist_channel:
+            #もし同じ名前のchannelがあったら、そしてそれが今編集中のチャンネル以外なら
+            if exist_channel and exist_channel['id']!=cid:
                 #「このチャンネルタイトルは既にあります」のメッセージが表示
-                flash('このチャンネルタイトルは既にあります')
+                flash('このChannelの名前は既にあります')
             #同じ名前のchannelがなければ
             else:
                 #channelに編集されたnameとdescriptionが入る
                 Channel.update(name, description, cid)
                 #「チャンネルを編集しました」のメッセージが表示
-                flash('チャンネルを編集しました')
+                flash('Channelを編集しました')
                 #編集済みのchannelも含まれる更新されたチャンネル一覧ページに遷移
                 return redirect(url_for('channels_view'))
     #途中条件に合致しなければ、更新前のチャンネル一覧ページに遷移
@@ -226,13 +226,13 @@ def delete_channel(cid):
     #もし削除するchannelを作成したidとログインしているユーザーのidが違ったら
     if channel['created_by'] != uid:
         #「このチャンネルの削除権限がありません」と表示
-        flash('このチャンネルの削除権限がありません')
+        flash('このChannelの削除権限がありません')
     #削除するchannelを作成したidとログインしているユーザーのidが同じだったら
     else:
         #該当のチャンネルを削除
         Channel.delete(cid)
         #「チャンネルを削除しました」のメッセージが表示
-        flash('チャンネルを削除しました')
+        flash('Channelを削除しました')
         #削除後のチャンネル一覧ページに遷移
         return redirect(url_for('channels_view'))
     #途中の条件に合致しなければ、削除せずチャンネル一覧ページに遷移
