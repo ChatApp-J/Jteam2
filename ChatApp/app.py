@@ -35,7 +35,7 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
     nickname =request.form.get("nickname")
     password = request.form.get("password")
     confirm_password = request.form.get("confirm_password")
-    if name==" " or email==" " or nickname ==  " " or password == " " or confirm_password == " ":
+    if name=="" or email=="" or nickname=="" or password=="" or confirm_password=="":
         flash("空のフォームがあります。記入してください。")
         
     elif password != confirm_password:

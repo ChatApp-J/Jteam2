@@ -29,6 +29,9 @@
         {% endif %}
       {% endwith %}
           <input class="auth-button" type="submit" value="ログイン">
+          <a class="switch-auth-mode" href="{{ url_for('signup') }}">
+            新規登録
+          </a>
       </div>
     </form> 
 </div>    

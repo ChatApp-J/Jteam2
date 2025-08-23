@@ -2,8 +2,12 @@
 
 {% block title %}home{% endblock %} 
 
+{% block bgcolor %}<body bgcolor="009BC6">{% endblock %}
+
+{% block header %}<header class="channels-header">{% endblock %}
+
 {% block nav %}
-<a class="link" href="{{url_for('logout')}}">ログアウト</a>
+<a class="channels-header-link" href="{{url_for('logout')}}">ログアウト</a>
 {% endblock %}
 
 {% block main %}
@@ -18,8 +22,8 @@
     {% endwith %}
 <div class="main-container">
   <div class="channel-title">
-    <h1>CHANNEL一覧</h1>
     <p class="channel-user">ようこそ、{{ nickname }} さん</p>
+    <h2>CHANNEL一覧</h2>
   </div>
   
   <div id="channels-list">
