@@ -29,6 +29,7 @@ const createChannelsList = () => {
     const a = document.createElement("a");
     //新しいli要素を生成
     const li = document.createElement("li");
+    li.classList.add("channel-set")
     //channelURLという変数にテンプレートリテラル（バッククォートで囲んだ範囲を文字列とするリテラル(ベタがきした文字や数字))を代入
     //文字列内で${変数名}と書くと、変数の値を埋め込むことができる
     //ここではリンクのパスを渡している(@app.routeの後に指定しているもの)
@@ -39,6 +40,7 @@ const createChannelsList = () => {
     //要素.setAttributre(属性名, 値) 属性を設定変更するためのメソッド
     //つまり、a要素にhrefをchannelURLと設定している
     a.setAttribute("href", channelURL);
+    a.classList.add("channelname")
     //親要素.appendChild(子要素)
     //親要素liの末尾に子要素としてaを追加
     li.appendChild(a);
@@ -51,7 +53,7 @@ const createChannelsList = () => {
       const updateChannelButton = document.createElement('button')
       //innerHTMLはHTML要素の<開始タグ>と<終了タグ>に内包されたものでテキストだけでなくHTML要素も認識できる
       updateChannelButton.innerHTML =
-        '<ion-icon name="pencil-outline" style="color: blue"></ion-icon>';
+        '<ion-icon name="pencil" style="color: #403C3C"></ion-icon>';
         //updateButtonにクラス名update-buttonを追加
         updateChannelButton.classList.add('update_channel-button'); 
         li.appendChild(updateChannelButton);
@@ -73,7 +75,7 @@ const createChannelsList = () => {
     if (uid === channel.created_by) {
       const deleteChannelButton = document.createElement('button');
       deleteChannelButton.innerHTML =
-        '<ion-icon name="trash-bin-outline" style="color: blue"></ion-icon>';
+        '<ion-icon name="trash-outline" style="color: #403C3C"></ion-icon>';
         deleteChannelButton.classList.add('delete_channel-button');
         li.appendChild(deleteChannelButton);
         // ゴミ箱ボタンが押された時にdeleteモーダルを表示させる
@@ -89,7 +91,7 @@ const createChannelsList = () => {
     };
     
     const channelDescriptionTooltip = document.createElement("div");
-          channelDescriptionTooltip.style.display = "innerBlock";
+          channelDescriptionTooltip.style.display = "inline-Block";
           channelDescriptionTooltip.classList.add(
             "channel-description-tooltip"
           );
@@ -106,7 +108,7 @@ const createChannelsList = () => {
     const createChannelButton = document.createElement("ion-icon");
     createChannelButton.id = "create_channel-button";
     createChannelButton.name = "add-circle-outline";
-    createChannelButton.style = "color: blue";
+    createChannelButton.style = "color: #403C3C";
     ul.appendChild(createChannelButton);
 };
 //initは変数、{}内に初期化したときに実行する処理を書く

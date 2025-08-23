@@ -1,6 +1,14 @@
-{% extends 'top/base.html' %} {% block title %}
-<title>chatroom</title>
-{% endblock %} {% block main %}
+{% extends 'top/base.html' %}
+
+{% block title %}<title>chatroom</title>{% endblock %}
+
+{% block header %}<header class="channels-header">{% endblock %}
+
+{% block nav %}
+<a class="channels-header-link" href="{{url_for('channels_view')}}">チャンネル一覧</a>
+{% endblock %}
+
+{% block main %}
 <div class="main-container">
     <div id="chat-header">
       <p class="channel-title-text detail-title">PLAUDERN</p>

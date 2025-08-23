@@ -8,26 +8,8 @@
 {% block main %}
 <div class="auth-wrapper">
     <h1>新規登録</h1>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
       <form action ='' method="post">
-        <div class="form">
+        <div>
           <label for = 'name'>NAME</label>
           <input type = 'text' id = 'name' name = 'name'>
         </div>
@@ -47,20 +29,20 @@
           <label for = 'confirm_password'>確認PASSWORD</label>
           <input type = 'password' name = 'confirm_password'>
         </div>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% endwith %}
         <input class="auth-button" type = 'submit' value="登録">
           <a class="switch-auth-mode" href="{{ url_for('login_view') }}">
             ログイン
           </a>
       </form>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <script>
-      {% for msg in messages %}
-        alert("{{ msg }}");
-      {% endfor %}
-    </script>
-    {% endif %}
-  {% endwith %}
 </div>
 {% endblock %}
 </body>
