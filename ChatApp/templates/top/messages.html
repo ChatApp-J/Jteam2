@@ -24,18 +24,15 @@
     </div>
     <div id="message-area">
       {% if messages|length > 0 %} {% for message in messages %} {% if
-      message.uid == uid %}
+      message.uid == uid %}<!--もしメッセージのuidとセッションのuidが同じなら--><!--送信者が右寄せ　CSSでもしないとならない-->
       <div class="my-messages">
         <p class="box box-right">{{ message.message }}</p>
         <form
-          action="/channels/{{ channel.id }}/messages/{{ message.id }}"
+          action="{{url_for('delete_message',cid=channel.id,message_id=message.id)}}"
           method="POST"
         >
-          <button
-            class="delete-message-button"
-            name="message_id"
-            value="{{ message.id }}"
-          >
+          <button>
+            <class="delete-message-button">
             <ion-icon
               name="trash-bin-outline"
               style="color: #122543"
@@ -43,7 +40,7 @@
           </button>
         </form>
       </div>
-      {% else %}
+      {% else %}<!--受信が左寄せ　CSSでもしないとならない-->
       <div class="messages">
         <p class="user-name">{{ message.user_name }}</p>
         <p class="box box-left">{{ message.message }}</p>
@@ -53,9 +50,10 @@
       {% endif %}
     </div>
     <div class="typing-box-wrapper">
-      <form class="typing-box" method="POST" name="newMessageForm">
+      <form class="typing-box" method="POST" name="newMessageForm" enctype="multipart/form-data">
         <textarea name="message" id="message" autofocus></textarea>
         <input type="hidden" name="cid" value="{{ channel.id }}" />
+        <input type="file" name="image" accept="image/*">
         <button type="submit" id="add-message-button">
           <ion-icon name="paper-plane"></ion-icon>
         </button>
