@@ -1,5 +1,9 @@
 {% extends 'top/base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+{% endblock %}
+
 {% block title %}home{% endblock %} 
 
 {% block bgcolor %}<body bgcolor="009BC6">{% endblock %}
