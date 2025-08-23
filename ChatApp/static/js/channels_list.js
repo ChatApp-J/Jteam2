@@ -29,7 +29,7 @@ const createChannelsList = () => {
     const a = document.createElement("a");
     //新しいli要素を生成
     const li = document.createElement("li");
-    li.classList.add("channel-set")
+    li.classList.add("channel-set");
     //channelURLという変数にテンプレートリテラル（バッククォートで囲んだ範囲を文字列とするリテラル(ベタがきした文字や数字))を代入
     //文字列内で${変数名}と書くと、変数の値を埋め込むことができる
     //ここではリンクのパスを渡している(@app.routeの後に指定しているもの)
@@ -40,13 +40,12 @@ const createChannelsList = () => {
     //要素.setAttributre(属性名, 値) 属性を設定変更するためのメソッド
     //つまり、a要素にhrefをchannelURLと設定している
     a.setAttribute("href", channelURL);
-    a.classList.add("channelname")
+    a.classList.add("channelname");
     //親要素.appendChild(子要素)
     //親要素liの末尾に子要素としてaを追加
     li.appendChild(a);
-    //ulの末尾にliを追加
-    ul.appendChild(li);
-        
+    
+    
     // もしチャンネル作成者uidと自分のuidが同じだった場合は編集ボタンを追加
     if (uid === channel.created_by){
       //createElement(タグ名)、引数のタグ名で指定されたHTML要素を生成  
@@ -64,6 +63,10 @@ const createChannelsList = () => {
           updateChannelModal.style.display = 'flex';
           const updateChannelForm = 
             document.getElementById('updateChannelForm');
+            const input_name = document.getElementById('updateChannelTitle');
+            input_name.value = channel.name;
+            const input_description = document.getElementById('updateChannelDescription');
+            input_description.value = channel.description;
             //文字列内で${変数名}と書くと、変数の値を埋め込むことができる
             //ここではendpoint変数にリンクのパスを渡している(@app.routeの後に指定しているもの)
             const endpoint = `/channels/update_channel/${channel.id}`;
@@ -89,18 +92,15 @@ const createChannelsList = () => {
             deleteChannelForm.action = endpoint;
         });
     };
-    
-    const channelDescriptionTooltip = document.createElement("div");
-          channelDescriptionTooltip.style.display = "inline-Block";
-          channelDescriptionTooltip.classList.add(
-            "channel-description-tooltip"
-          );
-          channelDescriptionTooltip.appendChild(li);
-          const tooltipBody = document.createElement("div");
-          tooltipBody.classList.add("tooltip-body");
-          tooltipBody.innerHTML = channel.description;
-          channelDescriptionTooltip.appendChild(tooltipBody);
-          ul.appendChild(channelDescriptionTooltip);
+
+    //説明文を追加
+    const channelDescription = document.createElement("div");
+    channelDescription.classList.add("channel-description");
+    channelDescription.innerHTML = channel.description;
+    li.appendChild(channelDescription);
+
+    //ulの末尾にliを追加
+    ul.appendChild(li);    
 
 
   });
