@@ -50,7 +50,7 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
         salt = User.random_name(10)
         print(salt)
         salt_password = password+salt
-        password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
+        password=User.stretching(salt_password)
         registered_user = User.find_by_email(email)#データベースに同じアドレスを探す
             
         if registered_user != None:#もし同じアドレスがあったら
@@ -95,7 +95,7 @@ def login_process():
             user = User.find_by_email(email)
             salt = user['salt'] 
             salt_password = password+salt
-            password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
+            password = User.stretching(salt_password)
             #入力されたパッシュ化されたpasswordとデータベースに登録されているそのユーザーのハッシュ化済みパスワードが一致しなければ 
             if password != user["password"]:
                 #パスワードが間違っています！と表示
@@ -267,15 +267,17 @@ def create_message(cid):#ユーザーがどのチャンネルに入ったかを�
     
         
 # メッセージの削除
-@app.route("/<cid>/messages", methods=["POST"])
+@app.route("/channels/<cid>/messages/<message_id>/delete", methods=["POST"])
 def delete_message(cid,message_id):
     uid = session["uid"]
     if uid is None:
         return redirect (url_for("login_view"))
-
-    if message_id:
-        Message.delete(message_id)
-    return redirect (url_for("detail", cid=cid))
+    after_check=Message.delete_message_owner(message_id, uid, cid)
+    if after_check == 0:
+        flash("このメッセージは削除できません")
+        return redirect(url_for("detail",cid=cid))
+    flash("メッセージを削除しました")
+    return redirect(url_for("detail", cid=cid))
         
 
 
