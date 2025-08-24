@@ -1,14 +1,16 @@
-from flask import abort
+from flask import abort, current_app#appを別のファイルから使用できる
 import pymysql
 from util.DB import DB
 import random, string
 import hashlib
 from werkzeug.utils import secure_filename
 import os
+import uuid
 
 db_pool = DB.init_db_pool()
 
-ALLOWED_EXTENSIONS =['png', 'jpg', 'jpeg', 'gif']#拡張子を確認のため
+
+ALLOWED_EXTENSIONS =['png', 'jpg', 'jpeg', 'gif', 'heic']#拡張子を確認のため
 UPLOAD_FOLDER = os.path.join('static','uploads')
 
 #ユーザークラス
@@ -60,13 +62,14 @@ class User:
     
 #メッセージクラス
 class Message:
-    @classmethod
-    def create(cls, uid, cid, message):
+    @classmethod #メッセージ、画像名をDBにお保存する関数
+    def create(cls, uid, cid, message, file):
+        image = cls.save_images(file) #複雑化したファイル名をimageに代入
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "INSERT INTO messages(uid, cid, message) VALUES(%s,%s,%s);"
-                cur.execute(sql, (uid,cid, message,))#タプル型で渡さないといけないため最後もカンマが必要
+                sql = "INSERT INTO messages(uid, cid, message, image) VALUES(%s,%s,%s,%s);"
+                cur.execute(sql, (uid,cid, message, image,))#タプル型で渡さないといけないため最後もカンマが必要
                 conn.commit()
         except pymysql.Error as e:
             print(f"エラーが発生しています:{e}")
@@ -100,9 +103,9 @@ class Message:
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT id, u.uid, nickname, message FROM messages AS m INNER JOIN users AS u ON m.uid = u.uid WHERE m.cid = %s ORDER BY m.id ASC;'
+                sql = 'SELECT id, u.uid, nickname, message, m.image FROM messages AS m INNER JOIN users AS u ON m.uid = u.uid WHERE m.cid = %s ORDER BY m.id ASC;'
                 #messagesのuidとusersのuidを結合しメッセージを取得したいチャンネルIDの行だけ残し欲しい列のid, u.uid, nickname, messageを取り出しIDが小さい順で並び替え
-                cur.execute(sql,(cid),)#ユーザーが選択したチャンネルIDをsqlに渡す
+                cur.execute(sql,(cid,))#ユーザーが選択したチャンネルIDをsqlに渡す
                 message = cur.fetchall()#cur.executeで受けっとた全てをmessageに代入
                 return message
         except pymysql.Error as e:
@@ -129,18 +132,26 @@ class Message:
            
            
    
-    @classmethod
+    @classmethod #拡張子を確認する関数
     def allowed_file(cls, filename):
-        if '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS:#拡張子の確認
+        if '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS:#.があるかの確認　後ろから.までの１グループ取って拡張子を確認
             return True
         else:
             return False  
     
-    @classmethod
+    @classmethod #実際にファイル名を受け取り確認　安全なファイル名＋複雑化を行いフォルダに保存
     def save_images(cls,file):
-        if not file:
+        if not file or not file.filename:
             return None
-        
+        if not  cls.allowed_file(file.filename):#指定の拡張子か確認
+            return None
+        abs_dir = os.path.join(current_app.root_path, 'static', 'uploads')#app.pyのファイルの階層を基準に絶対パスを指定
+        safe_name = secure_filename(file.filename)#安全なファイル名に書き換え
+        save_name = f"{uuid.uuid4().hex}_{safe_name}"#安全なファイル名にuuidで作ったランダムな３２文字を追加することで特定しにくくする
+        save_path = os.path.join(abs_dir, save_name)
+        file.save(save_path)
+        return f"uploads/{save_name}"
+    
                 
 #チャンネルクラス
 class Channel:

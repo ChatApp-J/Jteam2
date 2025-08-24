@@ -2,7 +2,7 @@
 
 {% block title %}<title>chatroom</title>{% endblock %}
 
-{% block header %}<header class="channels-header">{% endblock %}
+{% block header %}<header class="channels-header"></header>{% endblock %}
 
 {% block nav %}
 <a class="channels-header-link" href="{{url_for('channels_view')}}">チャンネル一覧</a>
@@ -27,10 +27,12 @@
       message.uid == uid %}<!--もしメッセージのuidとセッションのuidが同じなら--><!--送信者が右寄せ　CSSでもしないとならない-->
       <div class="my-messages">
         <p class="box box-right">{{ message.message }}</p>
+      {% if message.image %}
+       <img src="{{ url_for('static', filename=message.image) }}" class="chat-image" width="220">
+       {% endif %}
         <form
           action="{{url_for('delete_message',cid=channel.id,message_id=message.id)}}"
-          method="POST"
-        >
+          method="POST">
           <button type='submit' class="delete-message-button">
             <ion-icon
               name="trash-bin-outline"
@@ -43,6 +45,9 @@
       <div class="messages">
         <p class="user-name">{{ message.nickname }}</p>
         <p class="box box-left">{{ message.message }}</p>
+      {% if message.image %}
+       <img src="{{ url_for('static', filename=message.image) }}" class="chat-image" width="220">
+       {% endif %}
       </div>
       {% endif %} {% endfor %} {% else %}
       <p id="no-message">まだメッセージがありません</p>
