@@ -75,19 +75,7 @@ class Message:
             db_pool.release(conn)
 
     
-    @classmethod
-    def delete(cls, message_id):
-        conn = db_pool.get_conn()    
-        try:
-            with conn.cursor() as cur:
-                sql = "DELETE FROM messages WHERE id=%s;"
-                cur.execute(sql, (message_id,))
-                conn.commit()
-        except pymysql.Error as e:
-            print(f"エラーが発生しています:{e}")
-            abort(500)
-        finally:
-           db_pool.release(conn)
+    
 
 
     @classmethod
@@ -112,9 +100,9 @@ class Message:
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT id, u.uid, nickname, message FROM messages AS m INNER JOIN users AS u ON m.uid = u.uid WHERE cid = %s ORDER BY id ASC;'
+                sql = 'SELECT id, u.uid, nickname, message FROM messages AS m INNER JOIN users AS u ON m.uid = u.uid WHERE m.cid = %s ORDER BY m.id ASC;'
                 #messagesのuidとusersのuidを結合しメッセージを取得したいチャンネルIDの行だけ残し欲しい列のid, u.uid, nickname, messageを取り出しIDが小さい順で並び替え
-                cur.execute(sql,(cid))#ユーザーが選択したチャンネルIDをsqlに渡す
+                cur.execute(sql,(cid),)#ユーザーが選択したチャンネルIDをsqlに渡す
                 message = cur.fetchall()#cur.executeで受けっとた全てをmessageに代入
                 return message
         except pymysql.Error as e:
@@ -124,13 +112,15 @@ class Message:
             db_pool.release(conn)
             
     @classmethod
-    def delete_message(cls, cid, message_id):
+    def delete_message_owner(cls, message_id, uid, cid):
         conn = db_pool.get_conn()
         try:
            with conn.cursor() as cur:
-               sql = "DELETE FROM messages WHERE id=%s;"
-               cur.execute(sql, (message_id,))#前列で作ったsql文を使いメッセージIDを削除
+               sql = "DELETE FROM messages WHERE id=%s AND uid=%s AND cid=%s LIMIT 1;"
+               cur.execute(sql, (message_id, uid, cid))#前列で作ったsql文を使いメッセージIDを削除
+               count=cur.rowcount
                conn.commit()
+               return count
         except pymysql.Error as e:
            print(f'エラーが発生しています：{e}')
            abort(500)
@@ -138,19 +128,7 @@ class Message:
            db_pool.release(conn)
            
            
-    @classmethod
-    def find(cls, cid, message_id):
-        conn = db_pool.get_conn()
-        try:
-            with conn.cursor() as cur:
-                sql = "SELECT id, uid, cid, message FROM messages WHERE id=%s LIMIT 1;"
-                cur.execute(sql, (message_id,))
-                return cur.fetchone()
-        finally:
-           db_pool.release(conn)    
-
-        
-            
+   
     @classmethod
     def allowed_file(cls, filename):
         if '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS:#拡張子の確認
@@ -162,7 +140,6 @@ class Message:
     def save_images(cls,file):
         if not file:
             return None
-        else 
         
                 
 #チャンネルクラス

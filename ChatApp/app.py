@@ -272,15 +272,12 @@ def delete_message(cid,message_id):
     uid = session["uid"]
     if uid is None:
         return redirect (url_for("login_view"))
-    
-    message = Message.find(message_id)
-    if message["uid"] !=uid:#もしセッションしているuidとメッセージuidが違ったら
+    after_check=Message.delete_message_owner(message_id, uid, cid)
+    if after_check == 0:
         flash("このメッセージは削除できません")
         return redirect(url_for("detail",cid=cid))
-
-    if message_id:
-        Message.delete(message_id)
-    return redirect (url_for("detail", cid=cid))
+    flash("メッセージを削除しました")
+    return redirect(url_for("detail", cid=cid))
         
 
 

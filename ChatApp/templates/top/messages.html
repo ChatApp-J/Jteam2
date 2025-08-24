@@ -31,8 +31,7 @@
           action="{{url_for('delete_message',cid=channel.id,message_id=message.id)}}"
           method="POST"
         >
-          <button>
-            <class="delete-message-button">
+          <button type='submit' class="delete-message-button">
             <ion-icon
               name="trash-bin-outline"
               style="color: #122543"
@@ -42,7 +41,7 @@
       </div>
       {% else %}<!--受信が左寄せ　CSSでもしないとならない-->
       <div class="messages">
-        <p class="user-name">{{ message.user_name }}</p>
+        <p class="user-name">{{ message.nickname }}</p>
         <p class="box box-left">{{ message.message }}</p>
       </div>
       {% endif %} {% endfor %} {% else %}
