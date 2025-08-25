@@ -98,19 +98,18 @@ h2{
 }
 #channels-list{
     width: 360px;
-    height: 400px;
+    min-height: 300px;
+    max-height: 400px;
     border-radius: 8px;
-    background-color: #eee;
+    background-color: #eee; 
+    overflow-y: scroll;
     /* padding:8px; */
 }
 .channel-box{
     display: flex;
     flex-direction: column;
 }
-#create_channel-button{
-    margin: 10px;
-    font-size: 80px;
-}
+
 .channel-description-tooltip{
     margin: 8px;
 }
@@ -132,10 +131,60 @@ h2{
     width: 40px;
     border: none;
 }
+
 .delete_channel-button{
     width: 40px;
     border: none;
 }
 ion-icon{
     font-size: 32px;
+}
+
+#footer{
+    width: 360px;
+    display: flex;
+    flex-direction: column; 
+    margin-top: 20px;
+    align-items: flex-end;
+}
+
+.create_channel-btn{
+    background-color: #009bc6;
+    color: white;
+    border: none;
+    font-size: 16px;
+}
+
+.create_channel-btn ion-icon {
+    font-size: 2.5em; 
+    vertical-align: -13px;
+    color: black;
+    border-radius: 50%;
+    background-color: white;
+}
+.create_channel-btn:hover{cursor: pointer;}
+
+.update_channel-button:hover{cursor: pointer;}
+
+.delete_channel-button:hover{cursor: pointer;}
+
+.flashes{
+  animation-name: flashin_out;
+  animation-duration: 3s;
+}
+
+@keyframes flashin_out{
+  0%{
+    opacity: 0;
+  }
+  50%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 0;
+  }
+}
+
+.channel-user{
+    text-align: center;
 }

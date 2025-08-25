@@ -99,7 +99,7 @@ def login_process():
             #入力されたパッシュ化されたpasswordとデータベースに登録されているそのユーザーのハッシュ化済みパスワードが一致しなければ 
             if password != user["password"]:
                 #パスワードが間違っています！と表示
-                flash('パスワードが間違っています！')
+                flash('パスワードが間違っています。')
                 return redirect(url_for('login_view')) 
             else:
                 #パスワードが一致すれば、このuserのidをセッションに一時保存する
