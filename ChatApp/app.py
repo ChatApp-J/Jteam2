@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv('SECRET_KEY'or uuid.uuid4().hex)#.envから秘密鍵を読み込む　なかったら生成する
 app.permanent_session_lifetime = timedelta(days=SESSION_DAYS)# セッションの日数を計算
-
+app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024
 
 #トップページの表示
 @app.route('/', methods = ['GET'])
@@ -260,8 +260,9 @@ def create_message(cid):#ユーザーがどのチャンネルに入ったかを�
         return redirect (url_for("login_view"))
     
     message = request.form.get("message") #フォームからメッセージを受け取る
-    if message:
-        Message.create(uid,cid,message)#DBに保存
+    file = request.files.get("image")#フォームからファイルを受け取る
+    if message or file:
+        Message.create(uid,cid,message,file)#DBに保存
     
     return redirect(url_for("detail", cid=cid))#今後app.routeが変更になっても関数が同じなら使えるためURL＿forを使用
     
@@ -282,4 +283,4 @@ def delete_message(cid,message_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
