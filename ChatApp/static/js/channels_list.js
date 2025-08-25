@@ -104,12 +104,6 @@ const createChannelsList = () => {
 
 
   });
-    // チャンネル追加ボタンを付け加える
-    const createChannelButton = document.createElement("ion-icon");
-    createChannelButton.id = "create_channel-button";
-    createChannelButton.name = "add-circle-outline";
-    createChannelButton.style = "color: #403C3C";
-    ul.appendChild(createChannelButton);
 };
 //initは変数、{}内に初期化したときに実行する処理を書く
 //ここではcreateChannelListでまとめた全ての処理と先頭のでimportしたファイルを読み込んでいる
