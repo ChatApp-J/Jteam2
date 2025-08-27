@@ -106,6 +106,17 @@ const createChannelsList = () => {
     ul.appendChild(li_2);
 
   });
+  //   //説明文を追加
+  //   const channelDescription = document.createElement("div");
+  //   channelDescription.classList.add("channel-description");
+  //   channelDescription.innerHTML = channel.description;
+  //   li.appendChild(channelDescription);
+
+  //   //ulの末尾にliを追加
+  //   ul.appendChild(li);    
+
+
+  
 };
 //initは変数、{}内に初期化したときに実行する処理を書く
 //ここではcreateChannelListでまとめた全ての処理と先頭のでimportしたファイルを読み込んでいる

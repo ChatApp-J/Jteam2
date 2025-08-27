@@ -87,6 +87,7 @@ ul{
 li{
   list-style:none;
 }
+
 /* channelsのCSS */
 .main-container{
     display: flex;
@@ -188,3 +189,81 @@ ion-icon{
 .channel-user{
     text-align: center;
 }
+
+/* messagesのcss */
+#message-area {
+  min-height: 65vh;
+  max-height: 570px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 16px 0px;
+  overflow-y: scroll;
+}
+
+#chat-header{
+    border-bottom: 2px solid #fff;
+}
+#chatroom-name{
+    color: #009BC6;
+    font-weight: bold;
+    margin: 4px;
+}
+#chatroom-description{
+    color: #009BC6;
+    font-weight: bold;
+    margin: 4px;
+}
+#no-message{
+    margin: auto;
+}
+.my-messages{
+    display: flex;
+}
+.box_box-right{
+    background-color: #403C3C;
+    color: #fff;
+    width: fit-content;
+    max-width: 60%;
+    margin-left: auto;
+    margin-right: 4px;
+    white-space: pre-wrap;
+}
+.delete-message-button{
+    border: none;
+    background-color: #C8E4EC;
+}
+.user-name{
+    font-size: 0.7em;
+    color: #403C3C;
+    margin: 4px 0px;
+}
+.box_box-left{
+    background-color: #eee;
+    color: #403C3C;
+    width: fit-content;
+    max-width: 60%;
+    margin: 4px 0px;
+    white-space: pre-wrap;
+}
+
+.typing-box-wrapper{
+    width: 100%;
+    background-color: #eee;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+.typing-box{
+    display: flex;
+}
+
+#add-message-button{
+    height: 100%;
+    width: 40px;
+    padding: 0;
+    margin: 0;
+}
+
+
