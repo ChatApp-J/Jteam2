@@ -277,7 +277,6 @@ def delete_message(cid,message_id):
     if after_check == 0:
         flash("このメッセージは削除できません")
         return redirect(url_for("detail",cid=cid))
-    flash("メッセージを削除しました")
     return redirect(url_for("detail", cid=cid))
         
 
