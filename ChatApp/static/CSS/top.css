@@ -110,7 +110,7 @@ h2{
     flex-direction: column;
 }
 
-.channel-description-tooltip{
+.channel-description{
     margin: 8px;
 }
 .channel-set{
@@ -169,8 +169,8 @@ ion-icon{
 .delete_channel-button:hover{cursor: pointer;}
 
 .flashes{
-  animation-name: flashin_out;
-  animation-duration: 3s;
+    animation-name: flashin_out;
+    animation-duration: 3s;
 }
 
 @keyframes flashin_out{
