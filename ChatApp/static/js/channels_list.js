@@ -94,14 +94,16 @@ const createChannelsList = () => {
     };
 
     //説明文を追加
+    const li_2 = document.createElement("li");
+    li_2.classList.add("channel-description-set");
     const channelDescription = document.createElement("div");
     channelDescription.classList.add("channel-description");
     channelDescription.innerHTML = channel.description;
-    li.appendChild(channelDescription);
+    li_2.appendChild(channelDescription);
 
     //ulの末尾にliを追加
     ul.appendChild(li);    
-
+    ul.appendChild(li_2);
 
   });
 };
