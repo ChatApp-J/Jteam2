@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv('SECRET_KEY'or uuid.uuid4().hex)#.envから秘密鍵を読み込む　なかったら生成する
 app.permanent_session_lifetime = timedelta(days=SESSION_DAYS)# セッションの日数を計算
-
+app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024
 
 #トップページの表示
 @app.route('/', methods = ['GET'])
@@ -50,7 +50,7 @@ def signup_create():#関数を制作しrequestを使用し登録内容を取得
         salt = User.random_name(10)
         print(salt)
         salt_password = password+salt
-        password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
+        password=User.stretching(salt_password)
         registered_user = User.find_by_email(email)#データベースに同じアドレスを探す
             
         if registered_user != None:#もし同じアドレスがあったら
@@ -95,11 +95,11 @@ def login_process():
             user = User.find_by_email(email)
             salt = user['salt'] 
             salt_password = password+salt
-            password = hashlib.sha256(salt_password.encode("utf-8")).hexdigest()
+            password = User.stretching(salt_password)
             #入力されたパッシュ化されたpasswordとデータベースに登録されているそのユーザーのハッシュ化済みパスワードが一致しなければ 
             if password != user["password"]:
                 #パスワードが間違っています！と表示
-                flash('パスワードが間違っています！')
+                flash('パスワードが間違っています。')
                 return redirect(url_for('login_view')) 
             else:
                 #パスワードが一致すれば、このuserのidをセッションに一時保存する
@@ -152,7 +152,7 @@ def create_channel():
     #もしnameが空欄だったら
     if not name:
         #メッセージが表示
-        flash('チャンネルタイトルが空欄です')
+        flash('Channelの名前が空欄です')
     #空欄がなければ    
     else:
         #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
@@ -160,7 +160,7 @@ def create_channel():
         #もし同じ名前のchannelがあったら
         if exist_channel:
             #「このチャンネルタイトルは既にあります」のメッセージが表示
-            flash('このチャンネルタイトルは既にあります')
+            flash('このchannelの名前は既にあります')
         #同じ名前のchannelがなければ
         else:
             #nameとdescriptionが入った新しいchannelが作られる
@@ -184,31 +184,31 @@ def update_channel(cid):
     #もし編集するchannelを作成したuidとログインしているユーザーのidが違ったら
     if channel['created_by'] != uid:
         #「このチャンネルの編集権限がありません」と表示
-        flash('このチャンネルの編集権限がありません')
+        flash('このChannelの編集権限がありません')
     #編集するchannelを作成したuidとログインしているユーザーのuidが同じだったら
     else:
         #編集フォームに入力されたchannel_titleを取得しname変数に代入
         name = request.form.get('channel_title')
         #編集フォームに入力されたchannel_descriptionを取得しdescription変数に代入
         description = request.form.get('channel_description')
-        #もしnameが空欄だったら
+        #もしnameが空欄か
         if not name:
             #メッセージが表示
-            flash('チャンネルタイトルが空欄です')
+            flash('Channelの名前が空欄です')
         #空欄でなければ
         else:
             #登録済みのチャンネルテーブルに、フォームに入力されたnameと同じnameがあるか確認
             exist_channel = Channel.find_by_name(name)
-            #もし同じ名前のchannelがあったら
-            if exist_channel:
+            #もし同じ名前のchannelがあったら、そしてそれが今編集中のチャンネル以外なら
+            if exist_channel and exist_channel['id']!=cid:
                 #「このチャンネルタイトルは既にあります」のメッセージが表示
-                flash('このチャンネルタイトルは既にあります')
+                flash('このChannelの名前は既にあります')
             #同じ名前のchannelがなければ
             else:
                 #channelに編集されたnameとdescriptionが入る
                 Channel.update(name, description, cid)
                 #「チャンネルを編集しました」のメッセージが表示
-                flash('チャンネルを編集しました')
+                flash('Channelを編集しました')
                 #編集済みのchannelも含まれる更新されたチャンネル一覧ページに遷移
                 return redirect(url_for('channels_view'))
     #途中条件に合致しなければ、更新前のチャンネル一覧ページに遷移
@@ -226,13 +226,13 @@ def delete_channel(cid):
     #もし削除するchannelを作成したidとログインしているユーザーのidが違ったら
     if channel['created_by'] != uid:
         #「このチャンネルの削除権限がありません」と表示
-        flash('このチャンネルの削除権限がありません')
+        flash('このChannelの削除権限がありません')
     #削除するchannelを作成したidとログインしているユーザーのidが同じだったら
     else:
         #該当のチャンネルを削除
         Channel.delete(cid)
         #「チャンネルを削除しました」のメッセージが表示
-        flash('チャンネルを削除しました')
+        flash('Channelを削除しました')
         #削除後のチャンネル一覧ページに遷移
         return redirect(url_for('channels_view'))
     #途中の条件に合致しなければ、削除せずチャンネル一覧ページに遷移
@@ -260,24 +260,26 @@ def create_message(cid):#ユーザーがどのチャンネルに入ったかを�
         return redirect (url_for("login_view"))
     
     message = request.form.get("message") #フォームからメッセージを受け取る
-    if message:
-        Message.create(uid,cid,message)#DBに保存
+    file = request.files.get("image")#フォームからファイルを受け取る
+    if message or file:
+        Message.create(uid,cid,message,file)#DBに保存
     
     return redirect(url_for("detail", cid=cid))#今後app.routeが変更になっても関数が同じなら使えるためURL＿forを使用
     
         
 # メッセージの削除
-@app.route("/<cid>/messages", methods=["POST"])
+@app.route("/channels/<cid>/messages/<message_id>/delete", methods=["POST"])
 def delete_message(cid,message_id):
     uid = session["uid"]
     if uid is None:
         return redirect (url_for("login_view"))
-
-    if message_id:
-        Message.delete(message_id)
-    return redirect (url_for("detail", cid=cid))
+    after_check=Message.delete_message_owner(message_id, uid, cid)
+    if after_check == 0:
+        flash("このメッセージは削除できません")
+        return redirect(url_for("detail",cid=cid))
+    return redirect(url_for("detail", cid=cid))
         
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -31,19 +31,25 @@
         </div>
       {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class="flashes">
+        <ul class="flashes" id="flash-message">
           {% for message in messages %}
             <li>{{ message }}</li>
           {% endfor %}
         </ul>
       {% endif %}
       {% endwith %}
-        <input class="auth-button" type = 'submit' value="登録">
+        <input class="auth-button" type = 'submit' value="新規登録">
           <a class="switch-auth-mode" href="{{ url_for('login_view') }}">
-            ログイン
+            ログイン画面へ
           </a>
       </form>
 </div>
 {% endblock %}
-</body>
-</html>
+{% block script %}
+<script>
+  const element = document.getElementById("flash-message");
+  setTimeout(() => { 
+      element.style.display = "none"; 
+  }, 3000);
+</script>
+{% endblock %}

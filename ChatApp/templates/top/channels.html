@@ -1,5 +1,9 @@
 {% extends 'top/base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+{% endblock %}
+
 {% block title %}home{% endblock %} 
 
 {% block bgcolor %}<body bgcolor="009BC6">{% endblock %}
@@ -13,7 +17,7 @@
 {% block main %}
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class="flashes">
+        <ul class="flashes" id="flash-message">
         {% for message in messages %}
           <li>{{ message }}</li>
         {% endfor %}
@@ -22,8 +26,8 @@
     {% endwith %}
 <div class="main-container">
   <div class="channel-title">
-    <p class="channel-user">ようこそ、{{ nickname }} さん</p>
-    <h2>CHANNEL一覧</h2>
+    <p class="channel-user">ようこそ {{ nickname }}さん</p>
+    <h2>Channel一覧</h2>
   </div>
   
   <div id="channels-list">
@@ -31,7 +35,10 @@
   </div>
   
   <div id="footer">
-    <p id="footer-text">アプリの名前？</p>
+    <button type="button" id="create_channel-button" class="create_channel-btn">
+      Channel新規作成
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </button>
   </div>
   {% include 'top/modal/create_channel.html' %}
   {% include 'top/modal/update_channel.html' %}
@@ -49,4 +56,10 @@
   src="{{url_for('static',filename='js/channels_list.js')}}"
   type="module"
 ></script>
+<script>
+  const element = document.getElementById("flash-message");
+  setTimeout(() => { 
+      element.style.display = "none"; 
+  }, 3000);
+</script>
 {% endblock %}

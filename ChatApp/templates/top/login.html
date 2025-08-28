@@ -21,7 +21,7 @@
       <div class="auth-button-container"></div>    
       {% with messages = get_flashed_messages() %}
         {% if messages %}
-          <ul class="flashes">
+          <ul class="flashes" id="flash-message">
           {% for message in messages %}
             <li>{{ message }}</li>
           {% endfor %}
@@ -30,9 +30,17 @@
       {% endwith %}
           <input class="auth-button" type="submit" value="ログイン">
           <a class="switch-auth-mode" href="{{ url_for('signup') }}">
-            新規登録
+            新規登録画面へ
           </a>
       </div>
     </form> 
 </div>    
+{% endblock %}
+{% block script %}
+<script>
+  const element = document.getElementById("flash-message");
+  setTimeout(() => { 
+      element.style.display = "none"; 
+  }, 3000);
+</script>
 {% endblock %}

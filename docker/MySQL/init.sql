@@ -35,8 +35,13 @@ CREATE TABLE messages(
     uid CHAR(36) NOT NULL,
     cid INT NOT NULL,
     message TEXT NOT NULL,
+    image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
     FOREIGN KEY (cid) REFERENCES channels(id) ON DELETE CASCADE
 );
+
+INSERT INTO users(uid, name, email, nickname, password, salt) VALUES('970af84c-dd40-47ff-af23','杉浦翔太','test@gmail.com', '翔太', '37268335dd6931045bdcdf92623ff819a64244b53d0e746d438797349d4da578','qwedsrtguh');
+INSERT INTO channels(id, name, created_by, description) VALUES(1, '子供を泣き止ます裏技','970af84c-dd40-47ff-af23', '子供が泣き止む裏技を披露する部屋');
+INSERT INTO messages(id, uid, cid, message) VALUES(1, '970af84c-dd40-47ff-af23', '1', '泣き止まないよ〜誰か助けて、、😭')
